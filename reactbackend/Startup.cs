@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,6 +28,17 @@ namespace reactbackend
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            // Add authentication (Azure AD) 
+            services
+             .AddAuthentication(sharedOptions =>
+             {
+                 sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+             })
+             .AddJwtBearer(options =>
+             {
+                 options.Audience = Configuration["AzureAd:ClientId"];
+                 options.Authority = $"{Configuration["AzureAd:Instance"]}{Configuration["AzureAd:TenantId"]}";
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,7 +57,7 @@ namespace reactbackend
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-
+            app.UseAuthentication();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

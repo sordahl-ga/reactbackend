@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { getToken } from '../adalConfig';
 
 export class FetchData extends Component {
   displayName = FetchData.name
@@ -7,7 +8,15 @@ export class FetchData extends Component {
     super(props);
     this.state = { forecasts: [], loading: true };
 
-    fetch('api/SampleData/WeatherForecasts')
+      fetch('api/SampleData/WeatherForecasts', {
+          method: 'GET',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + getToken()
+          }
+
+      })
       .then(response => response.json())
       .then(data => {
         this.setState({ forecasts: data, loading: false });
@@ -29,7 +38,7 @@ export class FetchData extends Component {
           {forecasts.map(forecast =>
             <tr key={forecast.dateFormatted}>
               <td>{forecast.dateFormatted}</td>
-              <td>{forecast.temperatureC}</td>
+              <td>{forecast.temperature}</td>
               <td>{forecast.temperatureF}</td>
               <td>{forecast.summary}</td>
             </tr>
