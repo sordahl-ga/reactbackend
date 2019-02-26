@@ -8,19 +8,21 @@
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;
     using Microsoft.Azure.Documents.Linq;
-
-    
+    using Microsoft.Extensions.Configuration;
+    using reactbackend.Utils;
     public class DocumentDBRepository<T> : IDocumentDBRepository<T> where T : class
     {
        
-        private readonly string Endpoint = "https://steveoreactdb.documents.azure.com:443/";
-        private readonly string Key = "JjTngWawG0XlXNOh5D52axCmZoMuw3lmhAZHptnJuBHNKjGKKHqlyumawuYjhZ2urUlQHvJpY2twAmc1aAAFGA==";
         private readonly string DatabaseId = "Weather";
         private readonly string CollectionId = "forecasts";
         private DocumentClient client;
-
-        public DocumentDBRepository()
+        private string Endpoint;
+        private string Key;
+        public DocumentDBRepository(IConfiguration config)
         {
+            SecretResolver secrets = new SecretResolver(config);
+            Endpoint = secrets.GetSecret("DBEndpoint").Result;
+            Key = secrets.GetSecret("DBKey").Result;
             this.client = new DocumentClient(new Uri(Endpoint), Key);
             CreateDatabaseIfNotExistsAsync().Wait();
             CreateCollectionIfNotExistsAsync().Wait();
@@ -50,7 +52,7 @@
         {
             IDocumentQuery<T> query = client.CreateDocumentQuery<T>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
-                new FeedOptions { MaxItemCount = -1 })
+                new FeedOptions { EnableCrossPartitionQuery = true,MaxItemCount = -1 }).Where(predicate)
                 .AsDocumentQuery();
 
             List<T> results = new List<T>();

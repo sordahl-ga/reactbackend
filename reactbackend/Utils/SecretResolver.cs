@@ -12,6 +12,7 @@ namespace reactbackend.Utils
 {
     public class SecretResolver
     {
+        
         private KeyVaultClient _client = null;
         private string _kvuri = null;
         private IConfiguration _config;

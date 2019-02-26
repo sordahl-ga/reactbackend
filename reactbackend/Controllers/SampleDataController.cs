@@ -21,13 +21,21 @@ namespace reactbackend.Controllers
         }
         private IDocumentDBRepository<WeatherForecast> GetDB()
         {
-            if (_docdbrepo == null) _docdbrepo = new DocumentDBRepository<WeatherForecast>();
+            if (_docdbrepo == null) _docdbrepo = new DocumentDBRepository<WeatherForecast>(_config);
             return _docdbrepo;
         }
         [HttpGet("[action]")]
         public async Task<IEnumerable<WeatherForecast>> WeatherForecasts()
         {
-            return await GetDB().GetItemsAsync(null);
+            try
+            {
+                return await GetDB().GetItemsAsync(t => t.Temperature > -1);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return new List<WeatherForecast>();
+            }
         }
 
         public class WeatherForecast

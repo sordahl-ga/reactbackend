@@ -7,8 +7,7 @@ export const adalConfig = {
     api: 'https://microsoft.onmicrosoft.com/29792077-f3fb-4c9b-8292-306fafbc135b',
   },
   postLogoutRedirectUri: window.location.origin,
-  redirectUri: 'https://steveoreact.azurewebsites.net',
-  cacheLocation: 'sessionStorage',
+  cacheLocation: 'sessionStorage'
 };
 
 export const authContext = new AuthenticationContext(adalConfig);
